@@ -32,6 +32,10 @@ public class Usuario {
     @Column(nullable = false, length = 12)
     private String phone;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rol rol;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 }
