@@ -1,6 +1,7 @@
 package com.sanos_y_salvos.serviciousuarios.Model;
 
 public enum Rol {
+    ROL_ADMIN,
     ROL_DUENO,
     ROL_RESCATISTA,
     ROL_CLINICA,

@@ -45,8 +45,20 @@ public class UsuarioService implements UserDetailsService {
         return usuarioRepository.existsByEmail(email);  }
 
 
+    /*Para borrar de verdad*/
+    @Transactional
     public void deleteByEmail(String email) {
+        if (!usuarioRepository.existsByEmail(email)){
+            throw new NoSuchElementException("Usuario no encontrado");
+        }
         usuarioRepository.deleteByEmail(email);
+    }
+
+    /*Para poner el estado de la cuenta en desactivado en vez de borrarla definitivamente*/
+    public void deactivateUserByEmail(String email) {
+        Usuario usuario = findByEmail(email);
+        usuario.setActivo(false);
+        usuarioRepository.save(usuario);
     }
 
     public Usuario save(Usuario usuario){
@@ -113,6 +125,11 @@ public class UsuarioService implements UserDetailsService {
         dto.setAddress(usuario.getAddress());
 
         return dto;
+    }
+    public UserProfileDTO getProfile(String email){
+        Usuario usuario = findByEmail(email);
+
+        return mapToUserProfileDTO(usuario);
     }
 
 
