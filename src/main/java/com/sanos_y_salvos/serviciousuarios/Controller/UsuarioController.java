@@ -1,6 +1,7 @@
 package com.sanos_y_salvos.serviciousuarios.Controller;
 
 
+import com.sanos_y_salvos.serviciousuarios.Assemblers.UsuarioModelAssembler;
 import com.sanos_y_salvos.serviciousuarios.DTO.PasswordChangeDTO;
 import com.sanos_y_salvos.serviciousuarios.DTO.UserProfileDTO;
 import com.sanos_y_salvos.serviciousuarios.Model.Usuario;
@@ -9,12 +10,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -24,20 +30,27 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private UsuarioModelAssembler usuarioAssembler;
+
     @PreAuthorize("hasAnyAuthority('ROL_ADMIN')")
     @GetMapping
     @Operation(summary = "Obtener todos los usuarios activos", security = @SecurityRequirement(name = "bearer-jwt"))
-    public ResponseEntity<List<Usuario>> listarActivos() {
-        List<Usuario> usuarios = usuarioService.findAllActive();
-        return ResponseEntity.ok(usuarios);
+    public ResponseEntity<CollectionModel<EntityModel<Usuario>>> listarActivos() {
+        List<EntityModel<Usuario>> usuarios = usuarioService.findAllActive().stream()
+                .map(usuarioAssembler::toModel)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(CollectionModel.of(usuarios,
+                linkTo(methodOn(UsuarioController.class).listarActivos()).withSelfRel()));
     }
 
     @PreAuthorize("hasAnyAuthority('ROL_ADMIN')")
     @GetMapping("/{username}")
     @Operation(summary = "Obtener usuario por email", security = @SecurityRequirement(name = "bearer-jwt"))
-    public ResponseEntity<Usuario> obtenerPorUsername(@PathVariable String username) {
+    public ResponseEntity<EntityModel<Usuario>> obtenerPorUsername(@PathVariable String username) {
         Usuario usuario = usuarioService.findByEmail(username);
-        return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(usuarioAssembler.toModel(usuario));
     }
 
     @GetMapping("/me")
