@@ -2,6 +2,7 @@ package com.sanos_y_salvos.serviciousuarios.Config;
 
 
 import com.sanos_y_salvos.serviciousuarios.Jwt.JwtRequestFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +35,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                 .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
