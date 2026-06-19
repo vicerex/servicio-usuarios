@@ -39,10 +39,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/favicon.ico",
-                                        "/doc/**").permitAll()
-
+                                        "/doc/**",
+                                 "/api/v1/auth/registro",
+                                 "/api/v1/auth/ingreso",
+                                        "/error"
+                                ).permitAll()
                                 .requestMatchers("/api/v1/auth/registro/admin").hasAuthority("ROL_ADMIN")
-                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 .anyRequest().authenticated()
 
                 )
